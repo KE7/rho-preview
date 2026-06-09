@@ -1,0 +1,305 @@
+/* ============================================================
+   charts.css, styles for the three native interactive charts
+   integrated into the live RHO project page:
+     1. LIBERO-PRO grouped bars   (scoped under .ix-bars)
+     2. Evolution trajectory      (scoped under .evo-* / .ix-evo)
+     3. Per-task progression      (scoped under .ix-pertask)
+   Plus the hover/focus tooltips added to the inline structural
+   bars (#struct-bars).
+
+   Design tokens (--green, --cyan, --surface, ...) come from the
+   page's own style.css :root; only the missing per-task line
+   colors are declared here. Every selector is scoped to its
+   chart container so nothing collides with the page chrome or
+   with the other chart. No CDN, self-contained, file:// safe.
+   ============================================================ */
+
+:root {
+  /* 7 per-task line colors, distinct, AA-legible on #08090d.
+     Only declared here (the page root does not define them). */
+  --t-cube-lifting:     #5cf2a0;  /* green   */
+  --t-cube-stack:       #38bdf8;  /* cyan    */
+  --t-cube-restack:     #a78bfa;  /* violet  */
+  --t-spill-wipe:       #ffcf5c;  /* amber   */
+  --t-two-arm-lift:     #ff8d4a;  /* orange  */
+  --t-two-arm-handover: #f472b6;  /* pink    */
+  --t-nut-assembly:     #ff6b5c;  /* coral   */
+}
+
+/* ---------- shared card shell ---------- */
+.ix-chart {
+  position: relative;
+  margin: 0;
+  padding: clamp(14px, 3vw, 26px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.ix-chart .ix-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+.ix-chart .ix-sub   { font-size: 0.82rem; color: var(--muted); margin: 0 0 6px; }
+.ix-chart .ix-foot  { color: var(--muted); font-size: 0.84rem; margin: 16px 0 0; }
+.ix-chart .ix-foot .sr-instr { color: var(--faint); display: block; margin-top: 4px; font-size: 0.78rem; }
+
+/* Stack the evolution + per-task charts vertically (full width each)
+   instead of the old side-by-side image pair. */
+.ix-stack { display: flex; flex-direction: column; gap: 28px; }
+
+/* ---------- shared legend chips ---------- */
+.ix-chart .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 8px; }
+.ix-chart .legend-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text);
+  font: inherit; font-size: 0.82rem; font-weight: 600;
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  transition: border-color .15s ease, opacity .15s ease, background .15s ease;
+}
+.ix-chart .legend-chip:hover { border-color: var(--green); }
+.ix-chart .legend-chip:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.ix-chart .legend-chip .swatch { flex: none; }
+.ix-chart .legend-chip[aria-pressed="false"] { opacity: 0.4; }
+.ix-chart .legend-chip[aria-pressed="false"] .label { text-decoration: line-through; }
+
+/* ---------- shared chart host + svg + tooltip shell ---------- */
+.ix-chart .chart-host { position: relative; width: 100%; }
+.ix-chart .chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.ix-chart .grid-line { stroke: var(--line); stroke-width: 1; }
+.ix-chart .axis-base { stroke: #3a4254; stroke-width: 1.5; }
+.ix-chart .tick-label { fill: var(--faint); font-size: 11px; font-family: var(--mono); }
+.ix-chart .axis-title { fill: var(--muted); font-size: 12px; font-weight: 600; }
+
+.ix-chart .chart-tip {
+  position: absolute; z-index: 6; pointer-events: none;
+  background: #04060a; border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 11px; min-width: 130px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.ix-chart .chart-tip .tip-cell { font-size: 0.72rem; color: var(--muted); }
+.ix-chart .chart-tip .tip-val  { font-size: 1.25rem; font-weight: 800; font-family: var(--mono); }
+
+/* ---------- shared <details> data-table fallback ---------- */
+.ix-chart .data-table-wrap { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+.ix-chart .data-table-wrap summary { cursor: pointer; color: var(--green-2); font-size: 0.84rem; font-weight: 600; }
+.ix-chart .data-table-scroll { overflow-x: auto; }
+.ix-chart table.ix-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.8rem; }
+.ix-chart table.ix-table th, .ix-chart table.ix-table td { border: 1px solid var(--line); padding: 6px 9px; text-align: right; }
+.ix-chart table.ix-table th:first-child, .ix-chart table.ix-table td:first-child { text-align: left; color: var(--muted); }
+.ix-chart table.ix-table thead th { color: var(--text); font-weight: 700; background: var(--surface-2); }
+
+/* noscript static fallback image inside an interactive chart card */
+.ix-chart noscript img { width: 100%; border-radius: var(--radius); background: #fff; border: 1px solid var(--line); display: block; }
+
+/* sr-only utility (scoped names, page-safe) */
+.ix-chart .sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ============================================================
+   1. LIBERO-PRO grouped bars  (.ix-bars)
+   ============================================================ */
+.ix-bars .legend-chip .swatch { width: 12px; height: 12px; border-radius: 3px; }
+.ix-bars .legend-chip .avg { color: var(--faint); font-family: var(--mono); font-size: 0.75rem; }
+
+.ix-bars .cell-label { fill: var(--muted); font-size: 12px; font-weight: 600; }
+.ix-bars .cell-sub   { fill: var(--faint); font-size: 10.5px; }
+.ix-bars .ref-line { stroke: var(--green); stroke-width: 1.4; stroke-dasharray: 5 4; opacity: 0.85; }
+.ix-bars .ref-tag  { fill: var(--green); font-size: 10.5px; font-weight: 700; font-family: var(--mono); }
+
+.ix-bars .bar { cursor: pointer; transition: opacity .15s ease, filter .15s ease; }
+.ix-bars .bar:hover, .ix-bars .bar.is-active { filter: brightness(1.18); }
+.ix-bars .bar:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ix-bars .bar { transform-box: fill-box; transform-origin: bottom; animation: ix-grow .5s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes ix-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+}
+
+.ix-bars .chart-tip { transform: translate(-50%, -100%); transition: opacity .1s ease; }
+.ix-bars .chart-tip[hidden] { display: none; }
+.ix-bars .chart-tip .tip-sys { font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.ix-bars .chart-tip .tip-sys .swatch { width: 10px; height: 10px; border-radius: 3px; }
+.ix-bars .chart-tip .tip-cell { margin: 2px 0 4px; }
+.ix-bars .chart-tip .tip-note { font-size: 0.68rem; color: var(--faint); margin-top: 3px; }
+
+/* ============================================================
+   2. Evolution trajectory  (.ix-evo wraps the .evo-* widget)
+   ============================================================ */
+.ix-evo .evo-card { margin: 0; padding: 0; background: none; border: 0; color: var(--text); font-family: var(--font); }
+.evo-head { margin: 0 0 6px; }
+.evo-title { font-size: clamp(1rem, 2.4vw, 1.2rem); font-weight: 700; margin: 0 0 4px; line-height: 1.2; }
+.evo-sub { color: var(--muted); font-size: 0.86rem; margin: 0; max-width: 64ch; }
+.evo-sub b { color: var(--text); font-weight: 700; }
+.evo-kicker { color: var(--green); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin: 0 0 8px; }
+
+.evo-legend { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 6px; }
+.evo-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text);
+  font-family: var(--font); font-size: 0.78rem; font-weight: 600;
+  padding: 5px 11px; border-radius: 999px;
+}
+.evo-chip .sw { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.evo-chip .sw-line { width: 14px; height: 0; border-top: 3px dashed var(--cyan); border-radius: 0; }
+.evo-chip .sw-star { width: 13px; height: 13px; flex: none; }
+
+.evo-host { position: relative; width: 100%; }
+.evo-svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: pan-y; }
+
+.evo-grid    { stroke: var(--line); stroke-width: 1; }
+.evo-grid-soft { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.6; }
+.evo-axis    { stroke: #3a4254; stroke-width: 1.4; }
+.evo-tick    { fill: var(--faint); font-size: 11px; font-family: var(--mono); }
+.evo-axtitle { fill: var(--muted); font-size: 12px; font-weight: 600; font-family: var(--font); }
+
+.evo-bestline { fill: none; stroke: var(--cyan); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 6 4; }
+
+.evo-pt { cursor: pointer; transition: r .1s ease, opacity .1s ease; }
+.evo-pt:focus { outline: none; }
+.evo-pt-frontier { fill: var(--green); stroke: #04140c; stroke-width: 1; opacity: 0.92; }
+.evo-pt-seed     { fill: var(--faint); stroke: var(--text); stroke-width: 1.4; }
+.evo-pt-baseline { fill: var(--coral); stroke: #1a0807; stroke-width: 1.4; }
+
+.evo-focusring { fill: none; stroke: var(--text); stroke-width: 1.6; opacity: 0; pointer-events: none; }
+.evo-focusring.on { opacity: 0.9; }
+
+.evo-sel-halo { fill: var(--amber); opacity: 0.18; pointer-events: none; }
+.evo-sel-star { fill: var(--amber); stroke: #1c1503; stroke-width: 1.1; cursor: pointer; }
+.evo-sel-label-bg { fill: rgba(10,12,16,0.96); stroke: var(--amber); stroke-width: 1.2; }
+.evo-sel-label-tx { fill: var(--amber); font-size: 11.5px; font-weight: 700; font-family: var(--mono); }
+.evo-anchor-tx { fill: var(--muted); font-size: 10.5px; font-family: var(--mono); }
+.evo-anchor-tx b { fill: var(--text); }
+
+.evo-pt:focus-visible + .evo-focusring,
+.evo-pt.kbd-focus { opacity: 1; }
+
+.evo-tip {
+  position: absolute; pointer-events: none; z-index: 10;
+  min-width: 150px; max-width: 240px;
+  background: rgba(8,9,13,0.96); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 11px;
+  font-family: var(--font); color: var(--text);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+.evo-tip.on { opacity: 1; transform: translateY(0); }
+.evo-tip .tip-id { font-family: var(--mono); font-size: 0.74rem; color: var(--green-2); font-weight: 700; letter-spacing: 0.02em; }
+.evo-tip .tip-id.sel { color: var(--amber); }
+.evo-tip .tip-id.base { color: var(--coral); }
+.evo-tip .tip-row { display: flex; justify-content: space-between; gap: 14px; font-size: 0.8rem; margin-top: 5px; }
+.evo-tip .tip-row .k { color: var(--muted); }
+.evo-tip .tip-row .v { color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; }
+.evo-tip .tip-tag { display: inline-block; margin-top: 6px; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 999px; }
+.evo-tip .tip-tag.sel  { background: rgba(255,207,92,0.16); color: var(--amber); }
+.evo-tip .tip-tag.base { background: rgba(255,107,92,0.16); color: var(--coral); }
+
+.evo-hint { margin: 8px 0 0; font-size: 0.74rem; color: var(--faint); }
+.evo-hint kbd { font-family: var(--mono); font-size: 0.7rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; color: var(--muted); }
+
+.evo-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.evo-details { margin: 14px 0 0; border-top: 1px solid var(--line); padding-top: 10px; }
+.evo-details > summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--muted); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.evo-details > summary:hover { color: var(--text); }
+.evo-details > summary::-webkit-details-marker { display: none; }
+.evo-details > summary::before { content: "\25B8"; color: var(--green); transition: transform .15s ease; display: inline-block; }
+.evo-details[open] > summary::before { transform: rotate(90deg); }
+.evo-tablewrap { max-height: 320px; overflow: auto; margin-top: 10px; border: 1px solid var(--line); border-radius: 10px; }
+table.evo-table { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
+table.evo-table th, table.evo-table td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.evo-table th { position: sticky; top: 0; background: var(--surface-2); color: var(--muted); font-weight: 700; text-align: right; z-index: 1; }
+table.evo-table td:first-child, table.evo-table th:first-child { text-align: left; font-family: var(--mono); }
+table.evo-table tr.is-selected td { background: rgba(255,207,92,0.10); color: var(--amber); font-weight: 700; }
+table.evo-table tr.is-baseline td { background: rgba(255,107,92,0.08); }
+
+@media (max-width: 480px) {
+  .evo-sub { font-size: 0.8rem; }
+  .evo-chip { font-size: 0.72rem; padding: 4px 9px; }
+  .evo-tip { min-width: 128px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .evo-pt, .evo-tip, .evo-focusring, .evo-details > summary::before { transition: none; }
+}
+
+/* ============================================================
+   3. Per-task progression  (.ix-pertask)
+   ============================================================ */
+.ix-pertask .legend { margin: 4px 0 12px; }
+.ix-pertask .legend-chip .swatch { width: 14px; height: 4px; border-radius: 2px; }
+.ix-pertask .legend-chip .val { color: var(--muted); font-family: var(--mono); font-size: 0.74rem; font-weight: 700; }
+.ix-pertask .legend-chip.is-emph { border-color: var(--text); background: #20242f; }
+
+.ix-pertask .legend-actions { margin: 0 0 8px; }
+.ix-pertask .legend-actions button { background: none; border: 0; color: var(--green-2); font: inherit; font-size: 0.78rem; font-weight: 600; cursor: pointer; padding: 2px 4px; }
+.ix-pertask .legend-actions button:hover { text-decoration: underline; }
+.ix-pertask .legend-actions button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.ix-pertask .legend-actions .sep { color: var(--faint); }
+
+.ix-pertask .chart-svg { touch-action: none; }
+.ix-pertask .grid-line.zero { stroke: #3a4254; stroke-width: 1.4; }
+.ix-pertask .sel-line { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 4 4; opacity: 0.6; }
+.ix-pertask .sel-tag  { fill: var(--muted); font-size: 10px; font-weight: 700; font-family: var(--mono); }
+
+.ix-pertask .series-line { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; transition: opacity .15s ease, stroke-width .15s ease; }
+.ix-pertask .series-dot { transition: opacity .15s ease; }
+.ix-pertask .series-g.is-dim .series-line { opacity: 0.16; }
+.ix-pertask .series-g.is-dim .series-dot { opacity: 0.10; }
+.ix-pertask .series-g.is-emph .series-line { stroke-width: 3.6; }
+.ix-pertask .series-g[hidden] { display: none; }
+
+.ix-pertask .series-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+.ix-pertask .series-hit:focus-visible + .series-line,
+.ix-pertask .series-g.is-emph .series-line { filter: drop-shadow(0 0 4px currentColor); }
+.ix-pertask .series-hit:focus-visible { outline: none; }
+
+.ix-pertask .hover-guide { stroke: var(--faint); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
+.ix-pertask .hover-marker { opacity: 0; }
+
+.ix-pertask .chart-tip {
+  opacity: 0; transform: translate(-50%, -100%); transition: opacity .1s ease; z-index: 5;
+}
+.ix-pertask .chart-tip.tip-below { transform: translate(-50%, 0); }
+.ix-pertask .chart-tip.is-on { opacity: 1; }
+.ix-pertask .chart-tip .tip-sys { font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.ix-pertask .chart-tip .tip-sys .swatch { width: 12px; height: 4px; border-radius: 2px; }
+.ix-pertask .chart-tip .tip-cell { margin: 3px 0 4px; font-family: var(--mono); }
+.ix-pertask .chart-tip .tip-val .unit { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+.ix-pertask table.ix-table th, .ix-pertask table.ix-table td { font-family: var(--mono); padding: 5px 8px; }
+.ix-pertask table.ix-table th:first-child, .ix-pertask table.ix-table td:first-child { font-family: var(--font); position: sticky; left: 0; background: var(--surface); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ix-pertask .series-line, .ix-pertask .series-dot, .ix-pertask .chart-tip { transition: none; }
+}
+
+@media (max-width: 560px) {
+  .ix-bars .cell-sub { display: none; }
+  .ix-pertask .tick-label { font-size: 10px; }
+  .ix-pertask .axis-title { font-size: 11px; }
+}
+
+/* ============================================================
+   4. Structural-prior inline bars enhancement (#struct-bars)
+   Tooltips + focus on the existing native HTML/CSS bars.
+   ============================================================ */
+#struct-bars { position: relative; }
+#struct-bars .bar-fill { cursor: default; }
+#struct-bars .bar-fill:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+#struct-bars .bar-fill:hover, #struct-bars .bar-fill.is-active { filter: brightness(1.12); }
+
+#struct-bars .sb-tip {
+  position: absolute; z-index: 7; pointer-events: none; opacity: 0;
+  left: 0; top: 0; transform: translate(-50%, -100%);
+  background: #04060a; border: 1px solid var(--line); border-radius: 9px;
+  padding: 7px 10px; min-width: 120px; max-width: 250px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  transition: opacity .1s ease;
+}
+#struct-bars .sb-tip.is-on { opacity: 1; }
+#struct-bars .sb-tip .sb-tip-label { font-size: 0.72rem; color: var(--muted); }
+#struct-bars .sb-tip .sb-tip-val { font-size: 1.2rem; font-weight: 800; font-family: var(--mono); color: var(--text); }
+#struct-bars .sb-tip .sb-tip-note { font-size: 0.68rem; color: var(--faint); margin-top: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  #struct-bars .sb-tip { transition: none; }
+}
