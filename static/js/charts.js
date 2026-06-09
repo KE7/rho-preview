@@ -233,14 +233,14 @@
 })();
 
 /* ============================================================
-   2. Evolution trajectory (inline-SVG scatter + best-by-train)
+   2. Evolution trajectory (inline-SVG scatter + best-by-validation)
    ============================================================ */
 (function () {
   "use strict";
 
   if (!document.getElementById("evo-chart")) { return; }
 
-  // gen, id, reward (mean validation reward), best (running max).
+  // gen, id, reward (mean shaped reward), best (running max).
   var DATA = [
     {gen:0,id:"g0-s0",reward:0.0932,best:0.0932},
     {gen:1,id:"g1-s1",reward:0.1067,best:0.1067},
@@ -371,8 +371,8 @@
 
     this.svg = el("svg", { "class": "evo-svg", role: "group", "aria-roledescription": "scatter chart" });
     this.svg.setAttribute("aria-label",
-      "Evolution trajectory: mean validation reward of accepted candidates over generations, " +
-      "with a best-by-train step line. Starts near " + fmt(META.seedReward, 3) +
+      "Evolution trajectory: mean shaped reward of accepted candidates over generations, " +
+      "with a best-by-validation step line. Starts near " + fmt(META.seedReward, 3) +
       " and the selected solver g134-s134 reaches " + fmt(META.selectedReward, 3) + ".");
     h.appendChild(this.svg);
 
@@ -445,7 +445,7 @@
     svg.appendChild(xt);
     var yt = el("text", { "class": "evo-axtitle", x: 13, y: plotT + ph / 2, "text-anchor": "middle",
       transform: "rotate(-90 13 " + (plotT + ph / 2) + ")" });
-    yt.textContent = "mean validation reward";
+    yt.textContent = "mean shaped reward";
     svg.appendChild(yt);
 
     var dStr = "";
@@ -492,7 +492,7 @@
       marker.setAttribute("role", "button");
       var role = isSel ? "selected solver" : isSeed ? "seed program" : isBase ? "first mutation (baseline)" : "accepted candidate";
       marker.setAttribute("aria-label",
-        role + " " + p.id + ", generation " + p.gen + ", mean validation reward " + fmt(p.reward, 3) +
+        role + " " + p.id + ", generation " + p.gen + ", mean shaped reward " + fmt(p.reward, 3) +
         ", best so far " + fmt(p.best, 3));
 
       var rec = { data: p, marker: marker, ring: ring, cx: cx, cy: cy, idx: idx };
@@ -580,7 +580,7 @@
       '<div class="tip-id' + idCls + '">' + p.id + '</div>' +
       '<div class="tip-row"><span class="k">generation</span><span class="v">' + p.gen + '</span></div>' +
       '<div class="tip-row"><span class="k">mean reward</span><span class="v">' + fmt(p.reward, 3) + '</span></div>' +
-      '<div class="tip-row"><span class="k">best-by-train</span><span class="v">' + fmt(p.best, 3) + '</span></div>' +
+      '<div class="tip-row"><span class="k">best-by-validation</span><span class="v">' + fmt(p.best, 3) + '</span></div>' +
       tag;
 
     var hostRect = this.host.getBoundingClientRect();
