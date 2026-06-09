@@ -203,7 +203,7 @@ sup { font-size: 0.62em; }
 .act-try     { background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%); }
 
 .act-rail {
-  position: absolute; top: clamp(80px, 12vh, 150px); left: var(--pad);
+  position: absolute; top: clamp(80px, 12vh, 150px); left: clamp(12px, 2vw, 28px);
   display: flex; flex-direction: column; gap: 6px;
 }
 .act-no { font-size: 0.8rem; font-weight: 800; color: var(--faint); font-variant-numeric: tabular-nums; }
