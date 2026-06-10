@@ -113,7 +113,7 @@ sup { font-size: 0.62em; }
   position: relative;
   min-height: 100svh;
   display: flex; flex-direction: column; justify-content: center;
-  padding: 120px var(--pad) 96px;
+  padding: 60px var(--pad) 48px;
   overflow: hidden;
 }
 .hero-video {
