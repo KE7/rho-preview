@@ -24,62 +24,62 @@
       video: V + "cube_lifting_reward1.000.mp4",
       poster: P + "poster_cube_lifting_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "A RHO-evolved policy lifting a cube to full reward on Robosuite.",
-      vs: " rho saturates this task. Full-reward rollout shown.",
-      nearMiss: { video: V + "cube_lifting_best_failed_reward_0p546_trial_39.mp4", poster: P + "poster_cube_lifting_best_failed_reward_0p546_trial_39.jpg", reward: "reward 0.546", caption: "A rare cube-lift failure (reward 0.546). RHO succeeds on 98 of 100 here." }
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
+      vs: "70.0% (490/700) under single-turn S4 deployment.",
+      nearMiss: { video: V + "cube_lifting_best_failed_reward_0p546_trial_39.mp4", poster: P + "poster_cube_lifting_best_failed_reward_0p546_trial_39.jpg", reward: "reward 0.546", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     },
     {
       id: "cube_stack", name: "Cube stack", tag: "win", status: "win",
       video: V + "cube_stack_reward1.000.mp4",
       poster: P + "poster_cube_stack_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "Stacking one cube on another to full reward under single-turn deployment.",
-      vs: "rho succeeds at full reward under single-turn deployment.",
-      nearMiss: { video: V + "cube_stack_best_failed_reward_0p008_trial_22.mp4", poster: P + "poster_cube_stack_best_failed_reward_0p008_trial_22.jpg", reward: "reward 0.008", caption: "A rare cube-stack failure (reward 0.008). RHO succeeds on 98 of 100 here." }
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
+      vs: "70.0% (490/700) under single-turn S4 deployment.",
+      nearMiss: { video: V + "cube_stack_best_failed_reward_0p008_trial_22.mp4", poster: P + "poster_cube_stack_best_failed_reward_0p008_trial_22.jpg", reward: "reward 0.008", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     },
     {
       id: "cube_restack", name: "Cube restack", tag: "below baseline", status: "lose",
       video: V + "cube_restack_reward1.000.mp4",
       poster: P + "poster_cube_restack_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "Restacking cubes to full reward, one of the harder Robosuite contact tasks.",
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
       vs: "",
-      nearMiss: { video: V + "cube_restack_best_failed_reward_0p009_trial_88.mp4", poster: P + "poster_cube_restack_best_failed_reward_0p009_trial_88.jpg", reward: "reward 0.009", caption: "The best near-miss on cube restack (reward 0.009). RHO reaches 54 of 100 here." }
+      nearMiss: { video: V + "cube_restack_best_failed_reward_0p009_trial_88.mp4", poster: P + "poster_cube_restack_best_failed_reward_0p009_trial_88.jpg", reward: "reward 0.009", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     },
     {
       id: "spill_wipe", name: "Spill wipe", tag: "saturates", status: "win",
       video: V + "spill_wipe_reward1.000.mp4",
       poster: P + "poster_spill_wipe_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "Completing the spill-wipe task at full reward, a contact-light task RHO saturates.",
-      vs: "rho saturates this contact-light task at full reward."
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
+      vs: "70.0% (490/700) under single-turn S4 deployment."
     },
     {
       id: "two_arm_handover", name: "Two-arm handover", tag: "best win", status: "win",
       video: V + "two_arm_handover_reward1.000.mp4",
       poster: P + "poster_two_arm_handover_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "A two-arm handover at full reward, the task where RHO wins most decisively over the multi-turn baseline.",
-      vs: "rho's most decisive win over the multi-turn baseline.",
-      nearMiss: { video: V + "two_arm_handover_best_failed_reward_0p068_trial_50.mp4", poster: P + "poster_two_arm_handover_best_failed_reward_0p068_trial_50.jpg", reward: "reward 0.068", caption: "A rare two-arm-handover failure (reward 0.068). RHO wins this task 86 of 100." }
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
+      vs: "70.0% (490/700) under single-turn S4 deployment.",
+      nearMiss: { video: V + "two_arm_handover_best_failed_reward_0p068_trial_50.mp4", poster: P + "poster_two_arm_handover_best_failed_reward_0p068_trial_50.jpg", reward: "reward 0.068", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     },
     {
       id: "two_arm_lift", name: "Two-arm lift", tag: "below baseline", status: "lose",
       video: V + "two_arm_lift_reward1.000.mp4",
       poster: P + "poster_two_arm_lift_reward1.000.jpg",
       reward: "reward 1.000",
-      caption: "A coordinated two-arm lift at full reward.",
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
       vs: "",
-      nearMiss: { video: V + "two_arm_lift_best_failed_reward_0p330_trial_47.mp4", poster: P + "poster_two_arm_lift_best_failed_reward_0p330_trial_47.jpg", reward: "reward 0.330", caption: "The best near-miss on two-arm lift (reward 0.330). RHO reaches 53 of 100 here." }
+      nearMiss: { video: V + "two_arm_lift_best_failed_reward_0p330_trial_47.mp4", poster: P + "poster_two_arm_lift_best_failed_reward_0p330_trial_47.jpg", reward: "reward 0.330", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     },
     {
       id: "nut_assembly", name: "Nut assembly", tag: "hardest", status: "hard",
       video: V + "nut_assembly_success_reward_1p000_trial_56.mp4",
       poster: P + "poster_nut_assembly_success_reward_1p000_trial_56.jpg",
       reward: "reward 1.000",
-      caption: "A rare nut-assembly success at full reward (trial 56). High-precision insertion is the hardest task in the suite, where both RHO and the baseline rarely succeed.",
-      vs: "Hardest task in the suite, and an open challenge for both rho and the baseline; use the toggle to see a rare success vs the best near-miss.",
-      nearMiss: { video: V + "nut_assembly_best_failed_reward_0p006_trial_11.mp4", poster: P + "poster_nut_assembly_best_failed_reward_0p006_trial_11.jpg", reward: "reward 0.006", caption: "The best near-miss on nut-assembly (reward 0.006), illustrating the fine-geometry ceiling RHO inherits from its driving LLM." }
+      caption: "A single execution of the candidate repository, no VDM, and no LLM code-generation calls.",
+      vs: "RHO inherits the spatial-reasoning limits of the LLM that drives its search.",
+      nearMiss: { video: V + "nut_assembly_best_failed_reward_0p006_trial_11.mp4", poster: P + "poster_nut_assembly_best_failed_reward_0p006_trial_11.jpg", reward: "reward 0.006", caption: "RHO inherits the spatial-reasoning limits of the LLM that drives its search." }
     }
   ];
 
