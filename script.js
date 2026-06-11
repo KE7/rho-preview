@@ -43,8 +43,8 @@
       poster: P + "poster_cube_restack_reward1.000.jpg",
       reward: "reward 1.000",
       caption: "Restacking cubes to full reward, one of the harder Robosuite contact tasks.",
-      vs: "On cube_restack, rho trails the multi-turn baseline in aggregate. A full-reward rollout is shown here.",
-      nearMiss: { video: V + "cube_restack_best_failed_reward_0p009_trial_88.mp4", poster: P + "poster_cube_restack_best_failed_reward_0p009_trial_88.jpg", reward: "reward 0.009", caption: "The best near-miss on cube restack (reward 0.009). RHO reaches 54 of 100 here, trailing the multi-turn baseline." }
+      vs: "",
+      nearMiss: { video: V + "cube_restack_best_failed_reward_0p009_trial_88.mp4", poster: P + "poster_cube_restack_best_failed_reward_0p009_trial_88.jpg", reward: "reward 0.009", caption: "The best near-miss on cube restack (reward 0.009). RHO reaches 54 of 100 here." }
     },
     {
       id: "spill_wipe", name: "Spill wipe", tag: "saturates", status: "win",
@@ -69,8 +69,8 @@
       poster: P + "poster_two_arm_lift_reward1.000.jpg",
       reward: "reward 1.000",
       caption: "A coordinated two-arm lift at full reward.",
-      vs: "On two_arm_lift, rho trails the multi-turn baseline in aggregate. A full-reward rollout is shown here.",
-      nearMiss: { video: V + "two_arm_lift_best_failed_reward_0p330_trial_47.mp4", poster: P + "poster_two_arm_lift_best_failed_reward_0p330_trial_47.jpg", reward: "reward 0.330", caption: "The best near-miss on two-arm lift (reward 0.330). RHO reaches 53 of 100 here, trailing the multi-turn baseline." }
+      vs: "",
+      nearMiss: { video: V + "two_arm_lift_best_failed_reward_0p330_trial_47.mp4", poster: P + "poster_two_arm_lift_best_failed_reward_0p330_trial_47.jpg", reward: "reward 0.330", caption: "The best near-miss on two-arm lift (reward 0.330). RHO reaches 53 of 100 here." }
     },
     {
       id: "nut_assembly", name: "Nut assembly", tag: "hardest", status: "hard",
@@ -145,6 +145,13 @@
 
   function setVs(text, status) {
     if (!stageVs) { return; }
+    if (!text) {
+      stageVs.hidden = true;
+      stageVs.textContent = "";
+      stageVs.className = "vs-line";
+      return;
+    }
+    stageVs.hidden = false;
     stageVs.textContent = text;
     stageVs.className = "vs-line " + (status === "lose" ? "lose" : (status === "hard" ? "hard" : "win"));
   }
