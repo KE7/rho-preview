@@ -204,8 +204,7 @@
       var dotClass = t.status === "lose" ? "lose" : (t.status === "hard" ? "hard" : "win");
       b.innerHTML =
         '<span class="tab-dot ' + dotClass + '"></span>' +
-        '<span class="tab-name">' + t.name + "</span>" +
-        '<span class="tab-tag">' + t.tag + "</span>";
+        '<span class="tab-name">' + t.name + "</span>";
       b.addEventListener("click", function () { selectTask(t.id, true); });
       b.addEventListener("keydown", function (ev) {
         var tabs = Array.prototype.slice.call(rail.querySelectorAll(".tab"));
